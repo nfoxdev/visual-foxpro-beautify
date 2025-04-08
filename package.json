@@ -1,0 +1,73 @@
+{
+  "name": "visual-foxpro-beautify",
+  "displayName": "Visual Foxpro Beautify",
+  "description": "Visual Foxpro Code Formatter",
+  "version": "1.0.2",
+  "publisher": "nfox",
+  "author": "Marco Plaza",
+  "icon": "images/nfoxLogo.png",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nfoxdev/visual-foxpro-beautify.git"
+  },
+  "activationEvents": [
+     "onLanguage:foxpro"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "foxpro",
+        "extensions": [
+          ".prg",
+          ".pr2",
+          ".sc2",
+          ".fr2"
+        ],
+        "aliases": [
+          "foxpro",
+          "Visual FoxPro",
+          "vfp",
+          "Foxpro",
+          "VisualFoxpro"
+        ],
+         "configuration": "./language-configuration.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[foxpro]": {
+        "editor.defaultFormatter": "nfox.visual-foxpro-beautify"
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "@types/vscode": "^1.73.0",
+    "@types/mocha": "^10.0.7",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^7.14.1",
+    "@typescript-eslint/parser": "^7.11.0",
+    "eslint": "^8.57.0",
+    "@vscode/test-cli": "^0.0.9",
+    "@vscode/test-electron": "^2.4.0"
+  },
+  "keywords": [
+    "foxpro",
+    "vfp",
+    "beautify"
+  ]
+}

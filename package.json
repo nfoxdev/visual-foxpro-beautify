@@ -2,8 +2,8 @@
   "name": "visual-foxpro-beautify",
   "displayName": "Visual Foxpro Beautify",
   "description": "Visual Foxpro Code Formatter",
-  "version": "1.0.2",
-  "publisher": "nfox",
+  "version": "1.1.0",
+  "publisher": "nFox",
   "author": "Marco Plaza",
   "icon": "images/nfoxLogo.png",
   "engines": {
@@ -26,9 +26,11 @@
         "id": "foxpro",
         "extensions": [
           ".prg",
-          ".pr2",
           ".sc2",
-          ".fr2"
+          ".fr2",
+          ".vc2",
+          ".prx",
+          ".prv"
         ],
         "aliases": [
           "foxpro",

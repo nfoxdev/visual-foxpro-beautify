@@ -1,171 +1,241 @@
 ********************************************************************************************************
-* vfpBeautify
-* Marco Plaza 2024 -  github.com/nfoxdev/visual-foxpro-beautify
+* vfpBeautify 
+* Marco Plaza 2024,2025 -  github.com/nfoxdev/visual-foxpro-beautify
 ********************************************************************************************************
-Parameters lpars
+parameters lpars
 
-Cd (Justpath(Fullpath('')))
-#Define crlf Chr(13)+Chr(10)
+cd (justpath(fullpath('')))
+#define crlf chr(13)+chr(10)
 
-lpars   = Alltrim(m.lpars,1,'"')
-srcFile = Strextract(m.lpars,'','|')
-fd3     = Strextract(m.lpars,'|','')
+lpars   = alltrim(m.lpars,1,'"')
+srcFile = strextract(m.lpars,'','|')
+fd3     = strextract(m.lpars,'|','')
 
-Set Library To (m.fd3) Additive
+resultText = filetostr(m.srcFile)
 
-resultfile = doBeautify(m.srcFile)
-resultText = Filetostr(m.resultfile)
+try
 
-Erase (m.resultfile)
+  set library to (m.fd3) additive
+
+  options = loadOptions(justpath(m.fd3))
+
+  if !isnull(m.options)
+    resultfile = doBeautify(m.srcFile,m.options)
+    resultText = filetostr(m.resultfile)
+    erase (m.resultfile)
+  endif
+
+catch
+  messagebox('An error occurred - try restart/reinstall extension',32,'vfp Beautify',5000)
+
+endtry
+
 
 stdOut(m.resultText)
 
 *-----------------------------------------
-Function stdOut( lcMessage )
+function stdOut( lcMessage )
 *-----------------------------------------
 * Declarar funciones de la API de Windows
 
-Declare Integer WriteFile In kernel32;
-   INTEGER hFile,;
-   STRING @lpBuffer,;
-   INTEGER nNumberOfBytesToWrite,;
-   INTEGER @lpNumberOfBytesWritten,;
-   INTEGER lpOverlapped
+  declare integer WriteFile in kernel32;
+    integer hFile,;
+    string @lpBuffer,;
+    integer nNumberOfBytesToWrite,;
+    integer @lpNumberOfBytesWritten,;
+    integer lpOverlapped
 
-Declare Integer GetStdHandle In kernel32 Integer nStdHandle
-#Define std_output_handle -11
+  declare integer GetStdHandle in kernel32 integer nStdHandle
+  #define std_output_handle -11
 
 * Obtener el handle de stdout
-hstdout = GetStdHandle(std_output_handle)
+  hstdout = GetStdHandle(std_output_handle)
 
 * Mensaje a escribir
-lnbyteswritten = 0
+  lnbyteswritten = 0
 
 * Escribir el mensaje a stdout
-WriteFile(hstdout, @lcMessage, Len(lcMessage), @lnbyteswritten, 0)
+  WriteFile(hstdout, @lcMessage, len(lcMessage), @lnbyteswritten, 0)
 
 
 *-------------------------------------------------------------------
-Function doBeautify( inFile )
+function doBeautify( inFile, options )
 *-------------------------------------------------------------------
 
-*filetostr(m.options,'beautify2options.txt') && todo: read from vscode user preferences
-options = Strconv("020000000300000002000000020000000000000000000000010000000000000000000000",16)
 
-#Define Tab  Chr(9)
+  #define tab  chr(9)
 
-Private symbol, winname, winpos, File, filetype, done, Flags, sniplineno, ;
-   classname, BaseClass, mtemp, temp, fpoutfile, mout, totallines
+  private symbol, winname, winpos, file, filetype, done, flags, sniplineno, ;
+    classname, baseclass, mtemp, temp, fpoutfile, mout, totallines
 
-Local ox, retval, mdatasess
+  local ox, retval, mdatasess
 
-_vfp.LanguageOptions = 0
+  _vfp.languageoptions = 0
 
-Set Talk Off
-Set Trbetween Off
+  set talk off
+  set trbetween off
 
-m.retval = ""
+  m.retval = ""
 
 * These variables are needed by the FD3.FLL library
-m.symbol = ""
-m.winname = 0
-m.winpos = 0
-m.file = ""
-m.filetype = ""
-m.done = 0
-m.flags = ""
-m.sniplineno = 0
-m.classname = ""
-m.baseclass = ""
-m.mtemp = ""
-m.temp = ""
-m.fpoutfile = -1
-m.mout = ""
-m.totallines = 0
+  m.symbol = ""
+  m.winname = 0
+  m.winpos = 0
+  m.file = ""
+  m.filetype = ""
+  m.done = 0
+  m.flags = ""
+  m.sniplineno = 0
+  m.classname = ""
+  m.baseclass = ""
+  m.mtemp = ""
+  m.temp = ""
+  m.fpoutfile = -1
+  m.mout = ""
+  m.totallines = 0
 
-ox = Createobject("CBeautify", m.inFile, @options)
+  ox = createobject("CBeautify", m.inFile, @options)
 
-If Type("OX") = "O"
-   m.retval = ox.outfile
-   ox = .Null.
-Endif
+  if type("OX") = "O"
+    m.retval = ox.outfile
+    ox = .null.
+  endif
 
 
-Return (m.retval)   && output file name
+  return (m.retval)   && output file name
 
 
 *****************************************************
-Define Class cbeautify As Session
+define class cbeautify as session
 *****************************************************
-   DataSession = 2      &&private
-   Visible = .F.
-   Name = "Beautify"
-   outfile = ""
+  datasession = 2      &&private
+  visible = .f.
+  name = "Beautify"
+  outfile = ""
 
 *--------------------------------------------------------
-   Procedure Init( m.inFile, m.options)
+  procedure init( m.inFile, m.options)
 *--------------------------------------------------------
-   Local fsuccess, outfile, libname, xrefname,mdbf
-   Local m.errlogfile, moldlogerrors
+    local fsuccess, outfile, libname, xrefname,mdbf
+    local m.errlogfile, moldlogerrors
 
-   Local nwindowhandle
-   Local nstartpos
-   Local nendpos
-   Local nstartline
-   Local nendline
-   Local nretcode
-   Local npos
-   Local ccodeblock
-   Local ctempinfile
-   Local cindenttext
-   Local i, ncnt
-   Local lselection
-   Local nnewlen
-   Local cfoxtoolslibrary
-   Local Array aedenv[25]
-   Local Array acodelines[1]
+    local nwindowhandle
+    local nstartpos
+    local nendpos
+    local nstartline
+    local nendline
+    local nretcode
+    local npos
+    local ccodeblock
+    local ctempinfile
+    local cindenttext
+    local i, ncnt
+    local lselection
+    local nnewlen
+    local cfoxtoolslibrary
+    local array aedenv[25]
+    local array acodelines[1]
 
-   Set Talk Off
-   Set Safety Off      && scoped to datasession
+    set talk off
+    set safety off      && scoped to datasession
 
 
-   Use fdkeywrd.Dbf ;
-      ORDER token ;
-      ALIAS fdkeywrd In 0
+    use fdkeywrd.dbf ;
+      order token ;
+      alias fdkeywrd in 0
 
-   Set Message To ""
+    set message to ""
 
-   Select fdkeywrd
+    select fdkeywrd
 
 
 * Generate a temp file in the temp file directory
-   m.outfile = Sys(2023) + "\" + Substr(Sys(2015), 3, 10) + ".TMP"
+    m.outfile = sys(2023) + "\" + substr(sys(2015), 3, 10) + ".TMP"
 
-   m.xrefname = "FDXREF"
-   Create Cursor (m.xrefname) (;
+    m.xrefname = "FDXREF"
+    create cursor (m.xrefname) (;
       symbol c(65),;
       procname c(40),;
-      FLAG c(1),;
-      LINENO N(5),;
-      sniprecno N(5),;
+      flag c(1),;
+      lineno n(5),;
+      sniprecno n(5),;
       snipfld c(10),;
-      sniplineno N(5),;
-      ADJUST N(5),;
+      sniplineno n(5),;
+      adjust n(5),;
       filename c(161);
       )
-   Index On Flag Tag Flag                   && for rushmore
-   Index On Upper(symbol)+Flag Tag symbol
+    index on flag tag flag                   && for rushmore
+    index on upper(symbol)+flag tag symbol
 
-   beautify(m.inFile, m.outfile, m.options)
+    beautify(m.inFile, m.outfile, m.options)
 
-   Select fdxref
-   Use
+    select fdxref
+    use
 
-   This.outfile = m.outfile
+    this.outfile = m.outfile
 
 
-   Endproc &&Init
+  endproc &&Init
 
 *************************************************************
-Enddefine
+enddefine
 *************************************************************
+
+*-----------------------------------------
+function loadOptions(cPath)
+*-----------------------------------------
+  #define configfilename 'beautifyOptions.txt'
+  #define defaultconfig "040000000300000002000000020000000000000000000000000000000000000001000000"
+
+  coptions = DEFAULTCONFIG
+  optfile  = forcepath(configfilename,m.cPath)
+
+  if file(m.optfile)
+    try
+      coptions = filetostr(m.optfile)
+    catch
+    endtry
+  endif
+
+  do form options name oConfig linked
+
+  oConfig.top = int(oConfig.top*.3)
+
+  with oConfig
+    .symbolsCap.listIndex 	= val(substr(m.coptions,1,2))
+    .keywordsCap.listIndex 	= val(substr(m.coptions,9,2))
+    .spaces.value 			= val(substr(m.coptions,17,2))
+    .indentUsing.listIndex 	= val(substr(m.coptions,25,2))
+    .indentComments.value 	= val(substr(m.coptions,41,2))
+    .indentProcedure.value 	= val(substr(m.coptions,57,2))
+    .indentDocase.value 	= val(substr(m.coptions,65,2))
+  endwith
+  read events
+
+  if !oConfig.run.ok
+    return null
+  endif
+
+
+  with oConfig
+    options = ;
+      pr(.symbolsCap.listIndex)+;
+      pr(.keywordsCap.listIndex)+;
+      pr(.spaces.value)+;
+      pr(.indentUsing.listIndex)+;
+      pr(0)+;
+      pr(.indentComments.value)+;
+      pr(0)+;
+      pr(.indentProcedure.value)+;
+      pr(.indentDocase.value;
+      )
+  endwith
+
+
+  strtofile(m.options,m.optfile)
+  return strconv(m.options,16)
+
+*-------------------------------------------------
+function pr(vv)
+*-------------------------------------------------
+  return transform(m.vv,'@l 99')+replicate('0',6)

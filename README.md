@@ -1,24 +1,17 @@
 
 # Foxpro Beautify
 
+## V 1.1.0
 
-Uses Visual Foxpro's beautify FLL to format prg files in vsCode
+Config preferences before formatting just like in VFP!:
 
-Use alt+shift+F or select Format Code from context menu
-
-
-## Features
-
-Precompiled with following preferences 
-
-- Indent using 2 spaces
-- keywords: mixed case
-- symbols: lowercase
+![alt text](image.png)
 
 
-## Extension Settings
+## Shortcut:
+shift+Alt+F or select Format Code from context menu
 
-todo: config via json.settings
+
 
 
 2025, Marco Plaza  

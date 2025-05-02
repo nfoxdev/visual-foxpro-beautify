@@ -1,10 +1,9 @@
 ********************************************************************************************************
-* vfpBeautify 
+* vfpBeautify
 * Marco Plaza 2024,2025 -  github.com/nfoxdev/visual-foxpro-beautify
 ********************************************************************************************************
 parameters lpars
 
-cd (justpath(fullpath('')))
 #define crlf chr(13)+chr(10)
 
 lpars   = alltrim(m.lpars,1,'"')
@@ -15,9 +14,12 @@ resultText = filetostr(m.srcFile)
 
 try
 
-  set library to (m.fd3) additive
+  curPath = justpath(m.fd3)
+  cd (m.curPath)
+  set library to (m.fd3)     
+  set library to vfp2c32.fll additive
 
-  options = loadOptions(justpath(m.fd3))
+  options = loadOptions(m.curPath)
 
   if !isnull(m.options)
     resultfile = doBeautify(m.srcFile,m.options)
@@ -26,7 +28,7 @@ try
   endif
 
 catch
-  messagebox('An error occurred - try restart/reinstall extension',32,'vfp Beautify',5000)
+  messagebox('An error occurred - try restart/reinstall extension' + message(),32,'vfp Beautify',5000)
 
 endtry
 
@@ -197,9 +199,9 @@ function loadOptions(cPath)
     endtry
   endif
 
-  do form options name oConfig linked
 
-  oConfig.top = int(oConfig.top*.3)
+  do form options name oConfig linked
+  centerWindow(m.oConfig)
 
   with oConfig
     .symbolsCap.listIndex 	= val(substr(m.coptions,1,2))
@@ -209,6 +211,7 @@ function loadOptions(cPath)
     .indentComments.value 	= val(substr(m.coptions,41,2))
     .indentProcedure.value 	= val(substr(m.coptions,57,2))
     .indentDocase.value 	= val(substr(m.coptions,65,2))
+    .visible = .t.
   endwith
   read events
 
@@ -231,7 +234,6 @@ function loadOptions(cPath)
       )
   endwith
 
-
   strtofile(m.options,m.optfile)
   return strconv(m.options,16)
 
@@ -239,3 +241,21 @@ function loadOptions(cPath)
 function pr(vv)
 *-------------------------------------------------
   return transform(m.vv,'@l 99')+replicate('0',6)
+
+
+*----------------------------------------
+function centerWindow( oForm )
+*----------------------------------------
+* get code process Id:
+  pid = _getParentprocess('Code.exe')
+  codeHwnd = 0
+
+  if pid > 0
+* get Code hwnd
+    local array wp(1)
+    aWindowsEx('wp','WO',1)
+    pidRow = ascan(wp,m.pid,1,-1,2,8)
+    codeHwnd = wp( m.pidRow,1)
+  endif
+
+  CenterWindowEx(oForm.hwnd, m.codeHwnd) && vfp2c32

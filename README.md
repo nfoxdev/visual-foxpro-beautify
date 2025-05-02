@@ -1,7 +1,7 @@
 
 # Foxpro Beautify
 
-## V 1.1.0
+## V 1.1.1
 
 Config preferences before formatting just like in VFP!:
 

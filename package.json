@@ -2,7 +2,7 @@
   "name": "visual-foxpro-beautify",
   "displayName": "Visual Foxpro Beautify",
   "description": "Visual Foxpro Code Formatter",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "publisher": "nFox",
   "author": "Marco Plaza",
   "icon": "images/nfoxLogo.png",
@@ -17,7 +17,7 @@
     "url": "https://github.com/nfoxdev/visual-foxpro-beautify.git"
   },
   "activationEvents": [
-     "onLanguage:foxpro"
+    "onLanguage:foxpro"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -39,7 +39,7 @@
           "Foxpro",
           "VisualFoxpro"
         ],
-         "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json"
       }
     ],
     "configurationDefaults": {

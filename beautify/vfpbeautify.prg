@@ -215,7 +215,7 @@ function loadOptions(cPath)
   endwith
   read events
 
-  if !oConfig.run.ok
+  if vartype(oConfig) # 'O' or !oConfig.run.ok
     return null
   endif
 

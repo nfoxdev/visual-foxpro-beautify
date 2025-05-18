@@ -3,6 +3,11 @@
 
 Uses Visual Foxpro beautify to format your code:
 
+Please make a donation to fuel the development of new FoxPro extensions for VS Code!
+
+![Donate using PayPal](https://www.paypalobjects.com/webstatic/en_US/i/buttons/PP_logo_h_100x26.png)
+
+
 ![alt text](image.png)
 
 ## v 1.1.2

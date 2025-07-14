@@ -13,6 +13,9 @@ Please make a donation! fuel the development of new FoxPro extensions for VS Cod
 
 ![alt text](image.png)
 
+## v 1.1.4
+focus the Run button on launch 
+
 ## v 1.1.2
 
 removed min-max buttons / bug fix closing window using close button / 20 secs auto-close

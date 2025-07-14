@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
       fs.writeFileSync(tempFilePath, text);
 
       // Ejecutar el formateador y obtener el texto formateado
-      const formattedText = formatWithVisualFoxProSync(tempFilePath);
+      const formattedText = formatWithVisualFoxProSync(tempFilePath, context);
 
       const fullRange = new vscode.Range(
         document.positionAt(0),
@@ -32,9 +32,9 @@ export function activate(context: vscode.ExtensionContext) {
   });
 }
 
-function formatWithVisualFoxProSync(filePath: string): string {
-  const executablePath = path.join(__dirname, "bin", "vfpbeautify.exe");
-  const fllPath = path.join(__dirname, "bin", "fd3.fll");
+function formatWithVisualFoxProSync(filePath: string, context: vscode.ExtensionContext): string {
+  const executablePath = path.join(context.extensionPath, "bin", "vfpbeautify.exe");
+  const fllPath = path.join(context.extensionPath, "bin", "fd3.fll");
   const command = `${executablePath} "${filePath}|${fllPath}"`;
   try {
     const stdout = execSync(command);
@@ -49,4 +49,4 @@ function formatWithVisualFoxProSync(filePath: string): string {
   }
 }
 
-export function deactivate() {}
+export function deactivate() { }
